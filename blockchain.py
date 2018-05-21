@@ -104,22 +104,12 @@ class Blockchain:
             current_block = self.chain[i]
             previous_block = self.chain[i-1]
 
-            # print i
-            # print current_block.hash
-            # print current_block.generate_hash()
-
             # Confirm the current block has not been manipulated
             if(current_block.hash != current_block.generate_hash()):
-                print current_block.hash
-                print current_block.generate_hash()
-                print "Block manipuated"
                 return False
 
             # Confirm the previous blocks hash is equal to the blocks hash
             if(current_block.previous_hash != previous_block.hash):
-                print current_block.previous_hash
-                print previous_block.hash
-                print "Previous block manipuated"
                 return False
 
             i += 1
