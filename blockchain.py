@@ -1,3 +1,9 @@
+#
+# author: amichaelwinter
+# Description: Simple single transaction block chain test. This is a
+# learning excercise and not meant to be used in any type of production
+# environment
+#
 import time
 import datetime
 import uuid
@@ -34,9 +40,8 @@ class Transaction:
 #
 class Block:
 
-    def __init__(self, index, datetime, transaction, previous_hash):
+    def __init__(self, datetime, transaction, previous_hash):
 
-        self.index = index
         self.datetime = datetime
         self.transaction = transaction
         self.previous_hash = previous_hash
@@ -50,13 +55,12 @@ class Block:
     #
     def generate_hash(self):
 
-        string_to_hash = str(self.index) + str(self.datetime) + self.transaction.long_string() + str(self.previous_hash) + self.nounce
-
-        return hashlib.sha224(string_to_hash).hexdigest()
+        string_to_hash = str(self.nounce) + str(self.datetime) + self.transaction.long_string() + str(self.previous_hash)
+        return hashlib.sha256(string_to_hash).hexdigest()
 
     def __str__(self):
 
-        return "Index: " + str(self.index) + " Date: " + str(self.datetime) + " Transaction:" + str(self.transaction) + " Hash: " + self.hash + " Previous Hash: " + self.previous_hash
+        return  "Date: " + str(self.datetime) + " Transaction:" + str(self.transaction) + " Hash: " + self.hash + " Previous Hash: " + self.previous_hash
 
 
 #
@@ -69,7 +73,7 @@ class Blockchain:
         # Add a dummy first transition
         dummy_transaction = Transaction("1", "1", 0)
         self.chain = []
-        self.chain.append(Block(0,datetime.datetime.now(), dummy_transaction, hashlib.sha224("First").hexdigest()))
+        self.chain.append(Block(datetime.datetime.now(), dummy_transaction, hashlib.sha224("First").hexdigest()))
 
     #
     # Adds a transaction to the Blockchain
@@ -81,18 +85,28 @@ class Blockchain:
         new_transaction = Transaction(sender_id, receiver_id, amount)
         previous_hash = self.chain[next_index - 1].hash
 
-        self.chain.append(Block(next_index, datetime.datetime.now(),new_transaction,previous_hash))
+        self.chain.append(Block(datetime.datetime.now(),new_transaction,previous_hash))
 
     #
     # Valdiate the chain
     #
     def validate_chain(self):
 
+        #C heck that the first block has not been tampered with
+        first_block = self.chain[0]
+        if(first_block.hash != first_block.generate_hash()):
+            return False
+
+        # Check the remaning blocks
         i = 1
         while (i < len(self.chain)):
 
             current_block = self.chain[i]
             previous_block = self.chain[i-1]
+
+            # print i
+            # print current_block.hash
+            # print current_block.generate_hash()
 
             # Confirm the current block has not been manipulated
             if(current_block.hash != current_block.generate_hash()):
@@ -145,27 +159,28 @@ def get_test_chain():
 
     return test_chain
 
+def print_test_result(test_name, result):
+    success_string = "Success" if result == True else "Failure"
+    print "Test: " + test_name + "\t................." + success_string
+
+
 #
-# RUN
 #
-print "\n----------PRINT A TEST CHAIN----------"
+#  RUN
+#
+#
+
+
+# Test - Unedited Chain
+print "\n\nTesting the Chain"
 bc_1 = get_test_chain()
-print bc_1
+print_test_result("Unedited Chain", bc_1.validate_chain() == True)
 
-print "\n----------TEST A NON MANIPULATED CHAIN----------"
-print str(bc_1.validate_chain())
+# Test - Manipulating an attribute
+bc_1.chain[0].datetime = datetime.datetime.now()
+print_test_result("Attribute Edit", bc_1.validate_chain() == False)
 
-print "\n----------TEST MANIPULATING AN IDEX----------"
-bc_1.chain[0].index = 5
-print(bc_1.chain[0])
-print str(bc_1.validate_chain())
-
-print "\n----------TEST MANIPULATING AN AMOUNT----------"
+# Test - Manipulating a transaction
 bc_2 = get_test_chain()
 bc_2.chain[1].transaction.amount = 100
-print str(bc_2.validate_chain())
-
-print "\n----------TEST MANIPULATING AN HASH----------"
-bc_3 = get_test_chain()
-bc_3.chain[1].hash = "234234"
-print str(bc_3.validate_chain())
+print_test_result("Transaction Edit", bc_1.validate_chain() == False)
