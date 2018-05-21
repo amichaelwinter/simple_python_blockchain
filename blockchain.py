@@ -148,7 +148,9 @@ def get_test_chain():
     test_chain.add_transaction("4444", "2222", 8)
 
     return test_chain
-
+#
+# Helped function for printing a test result
+#
 def print_test_result(test_name, result):
     success_string = "Success" if result == True else "Failure"
     print "Test: " + test_name + "\t................." + success_string
