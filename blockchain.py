@@ -70,10 +70,10 @@ class Blockchain:
 
     def __init__(self):
 
-        # Add a dummy first transition
-        dummy_transaction = Transaction("1", "1", 0)
+        # Add a genesis block
+        genesis_transaction = Transaction("1", "1", 0)
         self.chain = []
-        self.chain.append(Block(datetime.datetime.now(), dummy_transaction, hashlib.sha224("First").hexdigest()))
+        self.chain.append(Block(datetime.datetime.now(), genesis_transaction, hashlib.sha224("First").hexdigest()))
 
     #
     # Adds a transaction to the Blockchain
