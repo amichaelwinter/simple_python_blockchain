@@ -92,7 +92,7 @@ class Blockchain:
     #
     def validate_chain(self):
 
-        #C heck that the first block has not been tampered with
+        #Check that the first block has not been tampered with
         first_block = self.chain[0]
         if(first_block.hash != first_block.generate_hash()):
             return False
@@ -139,7 +139,7 @@ class Blockchain:
         return blockchain_string
 
 #
-# Helped function to get a test chain
+# Helper function to get a test chain
 #
 def get_test_chain():
 
@@ -149,7 +149,7 @@ def get_test_chain():
 
     return test_chain
 #
-# Helped function for printing a test result
+# Helper function for printing a test result
 #
 def print_test_result(test_name, result):
     success_string = "Success" if result == True else "Failure"
